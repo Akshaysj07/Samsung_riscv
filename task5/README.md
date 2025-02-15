@@ -12,31 +12,35 @@ A RISC-V-based traffic light controller utilizes **ultrasonic sensors** to detec
 
 ## **Circuit Connection**  
 The **ultrasonic sensors** are connected to the **RISC-V Processor** as follows:  
-- **VCC (Power) → 5V pin** on the processor board  
-- **GND (Ground) → GND pin** on the board  
-- **Trigger Pin → GPIO 10 (Sends ultrasonic pulse)**  
-- **Echo Pin → GPIO 11 (Receives reflected signal)**  
+- **VCC (Power) → P5V pin** on the processor board  
+- **GND (Ground) → P_GND pin** on the board  
+- **Trigger Pin → P10 (Sends ultrasonic pulse)**  
+- **Echo Pin → P11 (Receives reflected signal)**  
 
 The **traffic light system** is controlled by the **RISC-V Processor** through GPIO pins:  
-- **Red Light → GPIO 2**  
-- **Yellow Light → GPIO 3**  
-- **Green Light → GPIO 4**  
+- **Red Light → P2**  
+- **Yellow Light → P3**  
+- **Green Light → P4**  
+- **Buzzer → P6**  
+- **Laser Sensor → P12**  
 
 ## 📌 **Pin Connections**  
 ### **1️⃣ Ultrasonic Sensor**  
 | **Sensor Pin** | **RISC-V Pin** | **Description** |  
 |---------------|----------------|----------------|  
-| **VCC**       | **5V**          | Power Supply  |  
-| **GND**       | **GND**         | Ground        |  
-| **TRIG**      | **GPIO 10**     | Trigger Signal (Output) |  
-| **ECHO**      | **GPIO 11**     | Echo Response (Input) |  
+| **VCC**       | **P5V**        | Power Supply  |  
+| **GND**       | **P_GND**      | Ground        |  
+| **TRIG**      | **P10**        | Trigger Signal (Output) |  
+| **ECHO**      | **P11**        | Echo Response (Input) |  
 
 ### **2️⃣ Traffic Light System**  
 | **Traffic Light** | **RISC-V Pin** | **Description** |  
 |------------------|----------------|----------------|  
-| **Red Light**     | **GPIO 2**      | Stop Signal |  
-| **Yellow Light**  | **GPIO 3**      | Prepare to Stop |  
-| **Green Light**   | **GPIO 4**      | Go Signal |  
+| **Red Light**     | **P2**         | Stop Signal |  
+| **Yellow Light**  | **P3**         | Prepare to Stop |  
+| **Green Light**   | **P4**         | Go Signal |  
+| **Buzzer**        | **P6**         | Alert Sound |  
+| **Laser Sensor**  | **P12**        | Obstruction Detection |  
 
 ## 📌 **Working Process**  
 ### *Step-by-Step Working of the Traffic Light System with Buzzer & Laser Sensor*  
@@ -45,13 +49,13 @@ This system simulates a *traffic light sequence* and uses a *laser sensor* to de
 ### *1️⃣ System Initialization*  
 - The *RISC-V Processor* initializes and configures the *GPIO pins*.  
 - *LEDs (Red, Yellow, Green) & Buzzer* are set as *output*.  
-- *Laser Sensor* is set as *input* (GPIO 12).  
+- *Laser Sensor* is set as *input* (P12).  
 
 ### *2️⃣ Main Working Loop*  
 The system runs in a continuous loop, executing the *traffic light sequence*:  
 
 #### *🔴 Step 1: Red Light ON (Stop)*  
-- *Red LED (GPIO 2) turns ON*.  
+- *Red LED (P2) turns ON*.  
 - *Yellow & Green LEDs remain OFF*.  
 - *Laser Sensor checks for obstruction*:  
   - If *no obstruction (Laser Sensor = 1)* → Buzzer OFF.  
@@ -59,7 +63,7 @@ The system runs in a continuous loop, executing the *traffic light sequence*:
 - *Delay:* 5 seconds.  
 
 #### *🟠 Step 2: Red + Yellow Light ON (Prepare to Go)*  
-- *Red LED (GPIO 2) & Yellow LED (GPIO 3) turn ON*.  
+- *Red LED (P2) & Yellow LED (P3) turn ON*.  
 - *Green LED remains OFF*.  
 - *Laser Sensor checks for obstruction*:  
   - If *no obstruction* → Buzzer OFF.  
@@ -67,13 +71,13 @@ The system runs in a continuous loop, executing the *traffic light sequence*:
 - *Delay:* 2 seconds.  
 
 #### *🟢 Step 3: Green Light ON (Go)*  
-- *Green LED (GPIO 4) turns ON*.  
+- *Green LED (P4) turns ON*.  
 - *Red & Yellow LEDs turn OFF*.  
 - *Buzzer turns OFF regardless of the laser sensor*.  
 - *Delay:* 5 seconds.  
 
 #### *🟠 Step 4: Yellow Light ON (Slow Down)*  
-- *Only Yellow LED (GPIO 3) turns ON*.  
+- *Only Yellow LED (P3) turns ON*.  
 - *Red & Green LEDs remain OFF*.  
 - *Laser Sensor checks for obstruction*:  
   - If *no obstruction* → Buzzer OFF.  
@@ -89,7 +93,18 @@ The system runs in a continuous loop, executing the *traffic light sequence*:
 - *Buzzer Alerts:* Sounds *only during Red, Red+Yellow, and Yellow* if an obstruction is detected.  
 - *Green Light Priority:* The *buzzer is always OFF when the Green LED is ON.*  
 
+## 📌 **Truth Table**  
+| **S1** | **S0** | **L (Laser Sensor)** | **R (Red LED)** | **Y (Yellow LED)** | **G (Green LED)** | **B (Buzzer)** | **State Description** |  
+|------|------|----------------|-------------|--------------|-------------|------------|------------------|  
+| 0    | 0    | 1              | 1           | 0            | 0           | 0          | Red Light ON (No obstruction) |  
+| 0    | 0    | 0              | 1           | 0            | 0           | 1          | Red Light ON (Obstruction detected - Buzzer ON) |  
+| 0    | 1    | 1              | 1           | 1            | 0           | 0          | Red & Yellow Light ON (No obstruction) |  
+| 0    | 1    | 0              | 1           | 1            | 0           | 1          | Red & Yellow Light ON (Obstruction detected - Buzzer ON) |  
+| 1    | 0    | X              | 0           | 0            | 1           | 0          | Green Light ON (Buzzer OFF, Laser sensor ignored) |  
+| 1    | 1    | 1              | 0           | 1            | 0           | 0          | Yellow Light ON (No obstruction) |  
+| 1    | 1    | 0              | 0           | 1            | 0           | 1          | Yellow Light ON (Obstruction detected - Buzzer ON) |  
+
 ## Circuit Diagram  
-![Alt Text](Traffic_Light_Controller_RISCV.PNG)
+![Alt Text](Traffic_Light_Controller_RISCV.PNG)  
 ```
 
