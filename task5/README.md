@@ -105,6 +105,6 @@ The system runs in a continuous loop, executing the *traffic light sequence*:
 | 1    | 1    | 0              | 0           | 1            | 0           | 1          | Yellow Light ON (Obstruction detected - Buzzer ON) |  
 
 ## Circuit Diagram  
-![Alt Text](Traffic_Light_Controller_RISCV.PNG)  
+![Alt Text](snapshots/Traffic_Light_Controller_RISCV.PNG)  
 ```
 
