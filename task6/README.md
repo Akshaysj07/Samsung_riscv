@@ -34,7 +34,7 @@ void GPIO_Config(void) {
     GPIO_InitStructure.GPIO_Mode = GPIO_Mode_IPU;  // Pull-up input
     GPIO_Init(GPIOD, &GPIO_InitStructure);
 }
-```c
+```
 ---
 
 ## 2. Expected Output
